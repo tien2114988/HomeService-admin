@@ -1,18 +1,18 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import App from "@/app/App";
-import { ErrorsPage } from "@/app/modules/errors/ErrorsPage";
-import { Logout } from "@/app/modules/auth/Logout";
-import { AuthPage } from "../modules/auth/AuthPage";
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import App from '@/app/App';
+import { ErrorsPage } from '@/app/modules/errors/ErrorsPage';
+import { Logout } from '@/app/modules/auth/Logout';
+import { AuthPage } from '../modules/auth/AuthPage';
 // import { useAuth } from "../modules/auth/core/Auth";
-import { UserModel } from "../modules/auth/core/_models";
-import PrivateRoutes from "./PrivateRoutes";
+import { UserModel } from '../modules/auth/core/_models';
+import PrivateRoutes from './PrivateRoutes';
 
-const { BASE_URL = "/" } = import.meta.env;
+const { BASE_URL = '/' } = import.meta.env;
 const AppRoutes = () => {
   //   const { currentUser } = useAuth();
   const currentUser = {
     id: 1,
-    firstname: "abc",
+    firstname: 'abc',
   } as UserModel;
   //   const currentUser = undefined
 

@@ -1,17 +1,17 @@
-import { toAbsoluteUrl } from "@/lib/helper";
-import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { toAbsoluteUrl } from '@/lib/helper';
+import { useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
 
 const ErrorsLayout = () => {
   useEffect(() => {
     document.body.style.backgroundImage = `url(${toAbsoluteUrl(
-      "media/errors/bg.jpg"
+      'media/errors/bg.jpg',
     )})`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundRepeat = 'no-repeat';
 
     return () => {
-      document.body.style.backgroundImage = ""; // Clear on unmount
+      document.body.style.backgroundImage = ''; // Clear on unmount
     };
   }, []);
 

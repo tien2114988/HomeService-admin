@@ -4,9 +4,9 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Slash } from "lucide-react";
-import { LinkBreadCrumb } from "./LinkBreadCrumb";
+} from '@/components/ui/breadcrumb';
+import { Slash } from 'lucide-react';
+import { LinkBreadCrumb } from './LinkBreadCrumb';
 
 export interface Props {
   links: LinkBreadCrumb[];
@@ -14,17 +14,19 @@ export interface Props {
 
 const BreadCrumb = ({ links }: Props) => {
   return (
-    <div>
+    <div className="mb-4">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            <BreadcrumbLink href={links[0].href}>
+              {links[0].label}
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator>
             <Slash />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+            <BreadcrumbLink>{links[1].label}</BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

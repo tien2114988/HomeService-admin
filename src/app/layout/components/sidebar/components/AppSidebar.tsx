@@ -1,4 +1,4 @@
-import { Inbox, User } from "lucide-react";
+import { Inbox, User } from 'lucide-react';
 
 import {
   Sidebar,
@@ -9,112 +9,71 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { Collapsible } from "@radix-ui/react-collapsible";
-import {
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from '@/components/ui/sidebar';
 
 // Menu items.
 const items = [
   {
-    title: "Quản lý người dùng 11",
-    url: "/users",
+    title: 'Thống kê',
+    url: '/dashboard',
+    icon: Inbox,
+  },
+  {
+    title: 'Quản lý người dùng',
+    url: '/users',
     icon: User,
-    submenu: [
-      {
-        title: "Thông tin tài khoản",
-        url: "/users",
-      },
-      {
-        title: "Thông tin người dùng",
-        url: "/users",
-      },
-      {
-        title: "Dịch vụ cung cấp",
-        url: "/users",
-      },
-      {
-        title: "Đơn dịch vụ",
-        url: "/users",
-      },
-    ],
   },
   {
-    title: "Dịch vụ",
-    url: "/dashboard",
+    title: 'Cài đặt',
+    url: '/settings',
     icon: Inbox,
-    submenu: [
-      {
-        title: "Thông tin tài khoản",
-        url: "/dashboard",
-      },
-      {
-        title: "Thông tin người dùng",
-        url: "/dashboard",
-      },
-    ],
-  },
-  {
-    title: "Dịch vụ",
-    url: "/dashboard",
-    icon: Inbox,
-    submenu: [
-      {
-        title: "Thông tin tài khoản",
-        url: "/dashboard",
-      },
-      {
-        title: "Thông tin người dùng",
-        url: "/dashboard",
-      },
-    ],
   },
 ];
 
 export function AppSidebar() {
+  const currentPath = window.location.pathname;
+
   return (
-    <Sidebar side="left" variant="sidebar" collapsible="icon">
+    <Sidebar
+      side="left"
+      variant="sidebar"
+      collapsible="icon"
+      className="bg-white shadow-xl h-screen"
+    >
       <SidebarContent>
         <SidebarGroup>
           {/* Label */}
-          <SidebarGroupLabel>Home Service</SidebarGroupLabel>
+          <SidebarGroupLabel className="px-4 text-lg font-bold text-gray-600">
+            Quản trị viên
+          </SidebarGroupLabel>
           {/* Content */}
-          <SidebarGroupContent>
+          <SidebarGroupContent className="mt-4">
             <SidebarMenu>
-              {items.map((item) => (
-                <Collapsible defaultOpen className="group/collapsible">
-                  <SidebarMenu>
-                    <SidebarMenuItem key={item.title}>
-                      {/* Title */}
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton asChild>
-                          <a href={item.url}>
-                            <item.icon />
-                            <span className="w-full">{item.title}</span>
-                          </a>
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      {/* Content */}
-                      <CollapsibleContent>
-                        {item.submenu.map((i) => (
-                          <SidebarMenuSub key={i.title}>
-                            <SidebarMenuSubItem>
-                              <SidebarMenuButton asChild>
-                                <a href={i.url}>
-                                  <span>{i.title}</span>
-                                </a>
-                              </SidebarMenuButton>
-                            </SidebarMenuSubItem>
-                          </SidebarMenuSub>
-                        ))}
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </Collapsible>
+              {items.map(item => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className={`py-6 transition-colors duration-200 ${
+                      currentPath.startsWith(item.url)
+                        ? 'bg-teal-100 text-gray-600'
+                        : 'text-gray-600'
+                    }`}
+                  >
+                    <a
+                      href={item.url}
+                      className={`flex w-full items-center ${
+                        currentPath.startsWith(item.url)
+                          ? 'pointer-events-none'
+                          : ''
+                      }`}
+                    >
+                      <item.icon className="w-6 h-6 transition-transform duration-200" />
+                      <span className="w-full text-base font-medium">
+                        {item.title}
+                      </span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>

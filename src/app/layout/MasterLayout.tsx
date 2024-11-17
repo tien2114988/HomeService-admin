@@ -1,9 +1,7 @@
-import { Outlet } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "./components/sidebar/components/AppSidebar";
-import Header from "./components/header/Header";
-
-
+import { Outlet } from 'react-router-dom';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from './components/sidebar/components/AppSidebar';
+import Header from './components/header/Header';
 
 const MasterLayout = () => {
   return (
@@ -13,7 +11,9 @@ const MasterLayout = () => {
           <AppSidebar />
           <main className="w-full">
             <Header />
-            <Outlet />
+            <div className="px-4 py-2">
+              <Outlet />
+            </div>
           </main>
         </SidebarProvider>
       </div>

@@ -1,6 +1,6 @@
-import { toAbsoluteUrl } from "@/lib/helper";
-import { FC } from "react";
-import { Link } from "react-router-dom";
+import { toAbsoluteUrl } from '@/lib/helper';
+import { FC } from 'react';
+import { Link } from 'react-router-dom';
 
 const Error403: FC = () => {
   return (
@@ -16,7 +16,7 @@ const Error403: FC = () => {
       {/* Illustration */}
       <div className="mb-3">
         <img
-          src={toAbsoluteUrl("media/errors/403-error.jpg")}
+          src={toAbsoluteUrl('media/errors/403-error.jpg')}
           className="max-w-full max-h-[600px] dark:hidden"
           alt=""
         />

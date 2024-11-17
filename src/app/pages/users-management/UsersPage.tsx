@@ -1,28 +1,28 @@
-import BreadCrumb from "@/app/layout/components/breadcrumb/BreadCrumb";
-import { Navigate, Route, Routes } from "react-router-dom";
-import UsersListWrapper from "./users-list/UsersListWrapper";
-import { Provider } from "react-redux";
-import { store } from "./redux/store";
+import BreadCrumb from '@/app/layout/components/breadcrumb/BreadCrumb';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import UserList from './pages/UserList';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+import UserInfo from './pages/UserInfo';
 const UsersPage = () => {
   return (
     <Provider store={store}>
       <Routes>
+        <Route index path="" element={<UserList />} />
         <Route
-          path="lists"
+          path=":id"
           element={
             <>
               <BreadCrumb
                 links={[
-                  { label: "Users", href: "/users" },
-                  { label: "Users List", href: "/users/lists" },
+                  { label: 'Quản lý người dùng', href: '/users/' },
+                  { label: 'Thông tin', href: '' },
                 ]}
               />
-              <UsersListWrapper />
+              <UserInfo />
             </>
           }
         />
-        {/* Default Route */}
-        <Route index element={<Navigate to="lists" />} />
       </Routes>
     </Provider>
   );
