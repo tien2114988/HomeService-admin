@@ -14,6 +14,6 @@ export interface UserModel {
   district?: string;
   country?: string;
 
-  gender: "male" | "female";
+  gender: 'male' | 'female';
   phone?: string;
 }

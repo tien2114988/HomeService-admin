@@ -1,8 +1,9 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import MasterLayout from "../layout/MasterLayout";
-import DashboardWrapper from "../pages/dashboard/DashboardWrapper";
-import UsersPage from "../pages/users-management/UsersPage";
-import ServicesPage from "../pages/services/ServicesPage";
+import { Navigate, Route, Routes } from 'react-router-dom';
+import MasterLayout from '../layout/MasterLayout';
+import DashboardWrapper from '../pages/dashboard/DashboardWrapper';
+import UsersPage from '../pages/users-management/UsersPage';
+import PostPage from '../pages/posts/PostPage';
+import WorkPage from '../pages/works/WorkPage';
 
 const PrivateRoutes = () => {
   return (
@@ -11,7 +12,8 @@ const PrivateRoutes = () => {
         <Route path="auth/*" element={<Navigate to="/dashboard" />} />
         <Route path="dashboard/*" element={<DashboardWrapper />} />
         <Route path="users/*" element={<UsersPage />} />
-        <Route path="services/*" element={<ServicesPage />} />
+        <Route path="posts/*" element={<PostPage />} />
+        <Route path="works/*" element={<WorkPage />} />
       </Route>
     </Routes>
   );

@@ -1,3 +1,13 @@
+export interface ApiResponse<T> {
+  returnCode: number;
+  message: string;
+  items: T;
+}
+
+export interface AdminModel {
+  jwt: string;
+}
+
 export interface UserModel {
   id: string;
   name: string;
@@ -10,10 +20,28 @@ export interface UserModel {
   status: 'ACTIVE' | 'PROHIBITIVE';
   role: 'CUSTOMER' | 'FREELANCER';
   gender: 'MALE' | 'FEMALE';
+  createdAt: number[];
+  bankAccount?: BankAccountModel;
+  addresses: AddressModel[];
 }
 
-export interface ApiResponse<T> {
-  returnCode: string;
-  message: string;
-  items: T;
+export interface BankAccountModel {
+  accountNumber: string;
+  bank: BankModel;
+}
+
+export interface BankModel {
+  logo: string;
+  bin: string;
+  fiName: string;
+}
+
+export interface AddressModel {
+  id: string;
+  customerName: string;
+  phoneNumber: string;
+  detail: string;
+  latitude: string;
+  longtitude: string;
+  default: boolean;
 }

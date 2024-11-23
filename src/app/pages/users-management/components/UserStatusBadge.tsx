@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { getEnumValue, UserStatus } from '@/lib/enum';
+import { UserStatus } from '@/lib/constant';
 
 interface UserStatusBadgeProps {
   status: string; // Chấp nhận kiểu unknown
@@ -8,11 +8,11 @@ interface UserStatusBadgeProps {
 const UserStatusBadge: React.FC<UserStatusBadgeProps> = ({ status }) => {
   return (
     <Badge
-      className={`capitalize px-2 py-1 ${
-        status == 'ACTIVE' ? 'bg-emerald-400' : 'bg-red-400'
+      className={`text-center rounded-xl py-1 px-2 text-white pointer-events-none ${
+        UserStatus[status as keyof typeof UserStatus].bgColor
       }`}
     >
-      {getEnumValue(UserStatus, status)}
+      {UserStatus[status as keyof typeof UserStatus].value}
     </Badge>
   );
 };

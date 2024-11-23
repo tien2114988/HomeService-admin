@@ -9,7 +9,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -32,25 +31,69 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  getFilteredRowModel, // Thêm dòng này
-} from '@tanstack/react-table';
-import { getUsers } from '@/services/userService';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { getFilteredRowModel } from '@tanstack/react-table';
+import { getUsers, updateUser } from '@/services/userService';
 import { UserModel } from '@/models/User';
 import { useNavigate } from 'react-router-dom';
-import { getEnumValue, UserStatus } from '@/lib/enum';
 import UserStatusBadge from '../components/UserStatusBadge';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import { ReturnCode, UserStatus } from '@/lib/constant';
+import { useToast } from '@/hooks/use-toast';
 
 const UserList = () => {
+  const { toast } = useToast();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [users, setUsers] = useState<UserModel[]>([]);
+  const [loading, setLoading] = useState(true); // State to track loading
   const [globalFilter, setGlobalFilter] = useState('');
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [showUpdateModal, setShowUpdateModal] = useState(false); // Modal visibility state
+  const [selectedUser, setSelectedUser] = useState<UserModel>();
+  const [updatedStatus, setUpdatedStatus] = useState<string>('');
   const navigate = useNavigate();
 
-  const viewUserInfo = (user: UserModel) => {
+  const viewUser = (user: UserModel) => {
     navigate(`/users/${user.id}`, {
       state: { user },
     });
+  };
+
+  const openUpdateStatus = (user: UserModel, status: string) => {
+    setSelectedUser(user);
+    setShowUpdateModal(true);
+    setUpdatedStatus(status);
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    setShowUpdateModal(false);
+    setLoading(true);
+    const data = await updateUser(id, { status });
+    setLoading(false);
+    if (data.returnCode === ReturnCode.SUCCESS) {
+      const updatedUser: UserModel = data.items;
+      const updatedUsers = users.map(user =>
+        user.id === id ? updatedUser : user,
+      );
+      setUsers(updatedUsers);
+      toast({
+        title: 'Thành công',
+        description: 'Cập nhật trạng thái người dùng thành công',
+        variant: 'success',
+      });
+    } else {
+      toast({
+        title: 'Thất bại',
+        description: data.message,
+        variant: 'destructive',
+      });
+    }
   };
 
   const columns: ColumnDef<UserModel>[] = [
@@ -96,7 +139,11 @@ const UserList = () => {
         return (
           <div className="flex items-center">
             <Img
-              src="https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png"
+              src={
+                user.avatar
+                  ? user.avatar
+                  : 'https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png'
+              }
               alt="Avatar"
               width={32}
               height={32}
@@ -179,12 +226,24 @@ const UserList = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => viewUserInfo(user)}>
+              <DropdownMenuItem onClick={() => viewUser(user)}>
                 Xem thông tin
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => alert('Edit User')}>
-                Cấm hoạt động
-              </DropdownMenuItem>
+              {user.status === UserStatus.ACTIVE.key ? (
+                <DropdownMenuItem
+                  onClick={() =>
+                    openUpdateStatus(user, UserStatus.PROHIBITIVE.key)
+                  }
+                >
+                  Cấm hoạt động
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  onClick={() => openUpdateStatus(user, UserStatus.ACTIVE.key)}
+                >
+                  Bỏ cấm
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -198,10 +257,10 @@ const UserList = () => {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), // Thêm dòng này
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    onGlobalFilterChange: setGlobalFilter, // Đảm bảo thêm dòng này
+    onGlobalFilterChange: setGlobalFilter,
     state: { sorting, columnVisibility, globalFilter },
     globalFilterFn: (row, columnId, value) => {
       return String(row.getValue(columnId))
@@ -212,8 +271,10 @@ const UserList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // Start loading
       const data = await getUsers();
       setUsers(data.items);
+      setLoading(false); // End loading
     };
 
     fetchData();
@@ -270,7 +331,19 @@ const UserList = () => {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  {Array.from({ length: columns.length }).map(
+                    (__, colIndex) => (
+                      <TableCell key={colIndex}>
+                        <Skeleton className="h-5 w-full" />
+                      </TableCell>
+                    ),
+                  )}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map(cell => (
@@ -286,13 +359,44 @@ const UserList = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="text-center">
-                  Không tìm thấy người dùng.
+                  Không có người dùng.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+      {selectedUser && (
+        <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>
+                {updatedStatus === UserStatus.ACTIVE.key ? 'Bỏ cấm' : 'Cấm'}{' '}
+                người dùng
+              </DialogTitle>
+              <DialogDescription>
+                Bạn có chắc chắn muốn{' '}
+                {updatedStatus === UserStatus.ACTIVE.key ? 'bỏ cấm' : 'cấm'}{' '}
+                {selectedUser?.name}?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowUpdateModal(false)} // Close modal
+              >
+                Hủy
+              </Button>
+              <Button
+                type="submit"
+                onClick={() => updateStatus(selectedUser?.id, updatedStatus)}
+              >
+                Cập nhật
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

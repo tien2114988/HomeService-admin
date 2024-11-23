@@ -1,28 +1,14 @@
-import BreadCrumb from '@/app/layout/components/breadcrumb/BreadCrumb';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import UserList from './pages/UserList';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
-import UserInfo from './pages/UserInfo';
+import UserDetail from './pages/UserDetail';
 const UsersPage = () => {
   return (
     <Provider store={store}>
       <Routes>
         <Route index path="" element={<UserList />} />
-        <Route
-          path=":id"
-          element={
-            <>
-              <BreadCrumb
-                links={[
-                  { label: 'Quản lý người dùng', href: '/users/' },
-                  { label: 'Thông tin', href: '' },
-                ]}
-              />
-              <UserInfo />
-            </>
-          }
-        />
+        <Route path=":id" element={<UserDetail />} />
       </Routes>
     </Provider>
   );

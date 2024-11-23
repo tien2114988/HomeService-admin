@@ -1,7 +1,4 @@
-import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import {
   Tooltip,
@@ -11,7 +8,7 @@ import {
 
 const Header = () => {
   return (
-    <nav className="bg-teal-600 border-b border-gray-200 shadow-sm w-full flex justify-between items-center px-4 py-2">
+    <nav className="sticky top-0 bg-teal-600 border-b border-gray-200 shadow-sm w-full flex justify-between items-center px-4 py-2">
       <div className="flex items-center justify-between">
         <SidebarTrigger />
         <h1 className="ml-4 text-xl font-semibold text-white">

@@ -1,4 +1,5 @@
-import { Inbox, User } from 'lucide-react';
+import { User, Gauge, LayoutGrid, Landmark, ClipboardList } from 'lucide-react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 
 import {
   Sidebar,
@@ -14,9 +15,9 @@ import {
 // Menu items.
 const items = [
   {
-    title: 'Thống kê',
+    title: 'Bảng điều khiển',
     url: '/dashboard',
-    icon: Inbox,
+    icon: Gauge,
   },
   {
     title: 'Quản lý người dùng',
@@ -24,14 +25,24 @@ const items = [
     icon: User,
   },
   {
-    title: 'Cài đặt',
-    url: '/settings',
-    icon: Inbox,
+    title: 'Các đơn công việc',
+    url: '/posts',
+    icon: ClipboardList,
+  },
+  {
+    title: 'Loại dịch vụ',
+    url: '/works',
+    icon: LayoutGrid,
+  },
+  {
+    title: 'Tài khoản ngân hàng',
+    url: '/accounts',
+    icon: Landmark,
   },
 ];
 
 export function AppSidebar() {
-  const currentPath = window.location.pathname;
+  const location = useLocation(); // Sử dụng useLocation để lấy đường dẫn hiện tại
 
   return (
     <Sidebar
@@ -54,7 +65,7 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     className={`py-6 transition-colors duration-200 ${
-                      currentPath.startsWith(item.url)
+                      location.pathname.startsWith(item.url) // Sử dụng location.pathname
                         ? 'bg-teal-100 text-gray-600'
                         : 'text-gray-600'
                     }`}
@@ -62,12 +73,12 @@ export function AppSidebar() {
                     <a
                       href={item.url}
                       className={`flex w-full items-center ${
-                        currentPath.startsWith(item.url)
+                        location.pathname.startsWith(item.url)
                           ? 'pointer-events-none'
                           : ''
                       }`}
                     >
-                      <item.icon className="w-6 h-6 transition-transform duration-200" />
+                      <item.icon className="w-8 h-8 transition-transform duration-200 mr-2" />
                       <span className="w-full text-base font-medium">
                         {item.title}
                       </span>
