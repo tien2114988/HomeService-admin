@@ -1,9 +1,9 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import en from "./locales/en.json";
-import vn from "./locales/vn.json";
-import { getLanguage, LANGUAGE_STORAGE_KEY } from "./locales/LanguageHelper";
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import en from './locales/en.json';
+import vn from './locales/vn.json';
+import { getLanguage } from './locales/LanguageHelper';
 
 const lang = getLanguage();
 
@@ -21,8 +21,8 @@ i18n
       escapeValue: false,
     },
     detection: {
-      order: ["localStorage", "navigator"],
-      caches: ["localStorage"],
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
     },
   });
 

@@ -26,7 +26,9 @@ const WorkList: React.FC = () => {
     fetchData();
   }, []);
 
-  const viewWorkDetail = (id: string) => {};
+  const viewWorkDetail = (id: string) => {
+    console.log(id);
+  };
 
   return (
     <div className="w-full">
