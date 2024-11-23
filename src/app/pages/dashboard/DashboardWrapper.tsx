@@ -47,7 +47,7 @@ const MapWithMarker: React.FC = () => {
     <MapContainer
       center={[position.lat, position.lng]}
       zoom={15}
-      style={{ width: '100%', height: '500px' }}
+      className="z-0 w-full h-screen"
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
