@@ -1,4 +1,11 @@
-import { User, Gauge, LayoutGrid, Landmark, ClipboardList } from 'lucide-react';
+import {
+  User,
+  Gauge,
+  LayoutGrid,
+  Landmark,
+  ClipboardList,
+  UserPlus,
+} from 'lucide-react';
 import { useLocation } from 'react-router-dom'; // Import useLocation
 
 import {
@@ -33,6 +40,11 @@ const items = [
     title: 'Loại dịch vụ',
     url: '/works',
     icon: LayoutGrid,
+  },
+  {
+    title: 'Yêu cầu đăng ký',
+    url: '/requests',
+    icon: UserPlus,
   },
   {
     title: 'Tài khoản ngân hàng',

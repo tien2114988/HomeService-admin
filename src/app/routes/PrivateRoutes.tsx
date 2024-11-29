@@ -4,6 +4,7 @@ import DashboardWrapper from '../pages/dashboard/DashboardWrapper';
 import UsersPage from '../pages/users-management/UsersPage';
 import PostPage from '../pages/posts/PostPage';
 import WorkPage from '../pages/works/WorkPage';
+import RequestPage from '../pages/requests/RequestPage';
 
 const PrivateRoutes = () => {
   return (
@@ -14,6 +15,7 @@ const PrivateRoutes = () => {
         <Route path="users/*" element={<UsersPage />} />
         <Route path="posts/*" element={<PostPage />} />
         <Route path="works/*" element={<WorkPage />} />
+        <Route path="requests/*" element={<RequestPage />} />
       </Route>
     </Routes>
   );

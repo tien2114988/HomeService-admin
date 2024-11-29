@@ -1,3 +1,5 @@
+import { FreelancerWorkModel } from './Work';
+
 export interface ApiResponse<T> {
   returnCode: number;
   message: string;
@@ -23,6 +25,7 @@ export interface UserModel {
   createdAt: number[];
   bankAccount?: BankAccountModel;
   addresses: AddressModel[];
+  freelancerWorkServices: FreelancerWorkModel[];
 }
 
 export interface BankAccountModel {

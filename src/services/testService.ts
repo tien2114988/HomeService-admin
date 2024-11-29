@@ -1,14 +1,16 @@
 // userService.ts
 import axiosInstance from '@/config/axiosConfig';
 import { ApiResponse } from '@/models/User';
-import { FreelancerWorkModel, WorkModel } from '@/models/Work';
+import { QuestionModel } from '@/models/Work';
 
-const baseUrl = '/works';
+const baseUrl = '/tests';
 
-export const getAllWorks = async (): Promise<ApiResponse<WorkModel[]>> => {
+export const getQuestions = async (
+  testId: string,
+): Promise<ApiResponse<QuestionModel[]>> => {
   try {
-    const response: ApiResponse<WorkModel[]> = await axiosInstance.get(
-      `${baseUrl}`,
+    const response: ApiResponse<QuestionModel[]> = await axiosInstance.get(
+      `${baseUrl}/${testId}/questions`,
     );
     return response; // Trả về dữ liệu phản hồi đã được ép kiểu
   } catch (error) {
@@ -17,13 +19,29 @@ export const getAllWorks = async (): Promise<ApiResponse<WorkModel[]>> => {
   }
 };
 
-export const updateWork = async (
+export const addQuestion = async (
+  testId: string,
+  data: object,
+): Promise<ApiResponse<QuestionModel>> => {
+  try {
+    const response: ApiResponse<QuestionModel> = await axiosInstance.post(
+      `${baseUrl}/${testId}/questions`,
+      data,
+    );
+    return response; // Trả về dữ liệu phản hồi đã được ép kiểu
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
+  }
+};
+
+export const updateQuestion = async (
   id: string,
   data: object,
-): Promise<ApiResponse<WorkModel>> => {
+): Promise<ApiResponse<QuestionModel>> => {
   try {
-    const response: ApiResponse<WorkModel> = await axiosInstance.patch(
-      `${baseUrl}/${id}`,
+    const response: ApiResponse<QuestionModel> = await axiosInstance.patch(
+      `${baseUrl}/questions/${id}`,
       data,
     );
     return response; // Trả về dữ liệu phản hồi đã được ép kiểu
@@ -33,30 +51,12 @@ export const updateWork = async (
   }
 };
 
-export const getRequests = async (
-  id?: string,
-): Promise<ApiResponse<FreelancerWorkModel[]>> => {
-  let url = `${baseUrl}/freelancers`;
-  url += id ? '?id=' + id : '';
+export const deleteQuestion = async (
+  id: string,
+): Promise<ApiResponse<null>> => {
   try {
-    const response: ApiResponse<FreelancerWorkModel[]> =
-      await axiosInstance.get(url);
-    return response; // Trả về dữ liệu phản hồi đã được ép kiểu
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
-  }
-};
-
-export const updateRequest = async (
-  workId: string,
-  freelancerId: string,
-  data: object,
-): Promise<ApiResponse<FreelancerWorkModel>> => {
-  try {
-    const response: ApiResponse<FreelancerWorkModel> = await axiosInstance.put(
-      `${baseUrl}/${workId}/freelancers/${freelancerId}`,
-      data,
+    const response: ApiResponse<null> = await axiosInstance.delete(
+      `${baseUrl}/questions/${id}`,
     );
     return response; // Trả về dữ liệu phản hồi đã được ép kiểu
   } catch (error) {

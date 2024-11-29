@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserRole } from '@/lib/constant';
 import UserPosts from '../components/UserPosts';
 import BreadCrumb from '@/app/layout/components/breadcrumb/BreadCrumb';
+import ProvidingWork from '../components/ProvidingWork';
 
 const UserDetail: React.FC = () => {
   const location = useLocation();
@@ -62,7 +63,7 @@ const UserDetail: React.FC = () => {
           </TabsContent>
           {user.role === UserRole.FREELANCER && (
             <TabsContent value="service">
-              Change your password here.
+              <ProvidingWork user={user} />
             </TabsContent>
           )}
           <TabsContent value="post">

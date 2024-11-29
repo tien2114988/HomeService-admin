@@ -10,10 +10,14 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Img } from 'react-image';
 import { WorkType } from '@/lib/constant';
+import { User, ClipboardList } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const WorkList: React.FC = () => {
   const [works, setWorks] = useState<WorkModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,8 +30,11 @@ const WorkList: React.FC = () => {
     fetchData();
   }, []);
 
-  const viewWorkDetail = (id: string) => {
-    console.log(id);
+  const viewWorkDetail = (work: WorkModel, request: boolean) => {
+    console.log(request);
+    navigate(`/works/${work.id}`, {
+      state: { work, request },
+    });
   };
 
   return (
@@ -41,8 +48,8 @@ const WorkList: React.FC = () => {
           : works.map(work => (
               <Card
                 key={work.id}
-                onClick={() => viewWorkDetail(work.id)}
-                className="shadow-md hover:shadow-lg"
+                onClick={() => viewWorkDetail(work, false)}
+                className="shadow-md hover:shadow-lg cursor-pointer"
               >
                 <CardHeader className="p-0">
                   <Img
@@ -55,14 +62,37 @@ const WorkList: React.FC = () => {
                   <h3 className="text-lg font-semibold">
                     {WorkType[work.name as keyof typeof WorkType].value}
                   </h3>
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="text-sm text-gray-600 mt-2 line-clamp-3">
                     {work.description}
                   </p>
+                  <div className="flex flex-row justify-between items-center text-gray-500 my-4">
+                    <div className="flex flex-row">
+                      <User size={20} className="text-green-600" />
+                      <div className="text-sm">
+                        {work.numOfFreelancers} freelancers
+                      </div>
+                    </div>
+                    <div className="flex flex-row">
+                      <ClipboardList className="text-blue-500" size={20} />
+                      <div className="text-sm">
+                        {work.postPerMonth} đơn/tháng
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
-                <CardFooter className="p-4">
-                  {/* <button className="text-teal-600 font-medium hover:underline">
-                    Xem chi tiết
-                  </button> */}
+                <CardFooter className="flex flex-row justify-end">
+                  <Button
+                    onClick={event => {
+                      event.stopPropagation(); // Chặn sự kiện onClick của Card
+                      viewWorkDetail(work, true);
+                    }}
+                    className="relative bg-cyan-500 hover:bg-cyan-600 transition"
+                  >
+                    Yêu cầu đăng ký
+                    <span className="absolute top-[-5px] right-[-5px] bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {work.numOfRequests}
+                    </span>
+                  </Button>
                 </CardFooter>
               </Card>
             ))}

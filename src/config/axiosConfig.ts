@@ -36,8 +36,9 @@ axiosInstance.interceptors.response.use(
   },
   error => {
     // Xử lý lỗi API toàn cục ở đây
-    console.error('API Error:', error);
-    return Promise.reject(error);
+    return error && error.response && error.response.data
+      ? error.response.data
+      : Promise.reject(error);
   },
 );
 

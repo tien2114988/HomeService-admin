@@ -61,13 +61,15 @@ const Address: React.FC<AddressProps> = ({ addresses }) => {
                 )}
               </div>
               <div className="flex flex-row space-x-2">
-                <Phone className="text-cyan-600 w-5" />
+                <Phone size={20} className="text-cyan-600" />
                 <div className="text-gray-500">{address.phoneNumber}</div>
               </div>
 
-              <div className="flex flex-row space-x-2">
-                <MapPin className="text-red-600" />
-                <div className="text-gray-500">{address.detail}</div>
+              <div className="flex flex-row items-center space-x-2">
+                <MapPin size={20} className="text-red-600" />
+                <div className="text-gray-500 line-clamp-1 max-w-xs">
+                  {address.detail}
+                </div>
               </div>
             </Card>
           ))

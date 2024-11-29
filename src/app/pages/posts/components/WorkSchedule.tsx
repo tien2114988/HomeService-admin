@@ -62,7 +62,11 @@ const WorkSchedule: React.FC<WorkScheduleProps> = ({ post }) => {
           >
             <div className="flex flex-row justify-between items-center">
               <h3 className="font-semibold">
-                {moment(workSchedule.date)?.format('DD/MM/YYYY')}
+                {moment([
+                  workSchedule.date[0],
+                  workSchedule.date[1] - 1,
+                  workSchedule.date[2],
+                ])?.format('DD/MM/YYYY')}
               </h3>
               <WorkScheduleStatusBadge status={workSchedule.status} />
             </div>

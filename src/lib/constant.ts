@@ -11,6 +11,19 @@ export const UserStatus = {
   },
 };
 
+export const QuestionType = {
+  MULTICHOICE: {
+    key: 'MULTICHOICE',
+    value: 'Trắc nghiệm',
+    bgColor: 'bg-blue-400', // Màu xám cho trạng thái khởi tạo
+  },
+  ESSAY: {
+    key: 'ESSAY',
+    value: 'Tự luận',
+    bgColor: 'bg-yellow-400', // Màu xám cho trạng thái khởi tạo
+  },
+};
+
 export const UserRole = {
   CUSTOMER: 'CUSTOMER',
   FREELANCER: 'FREELANCER',
@@ -93,6 +106,29 @@ export const PostStatus = {
     key: 'FAILED',
     value: 'Thất bại',
     bgColor: 'bg-orange-400', // Màu cam cho trạng thái thất bại
+  },
+};
+
+export const FreelancerWorkStatus = {
+  INITIAL: {
+    key: 'INITIAL',
+    value: 'Gửi yêu cầu',
+    bgColor: 'bg-blue-400', // Màu xám cho trạng thái khởi tạo
+  },
+  PROHIBITIVE: {
+    key: 'PROHIBITIVE',
+    value: 'Bị cấm',
+    bgColor: 'bg-red-400', // Màu đỏ cho trạng thái bị hủy
+  },
+  WORK: {
+    key: 'WORK',
+    value: 'Đã đăng ký',
+    bgColor: 'bg-green-400', // Màu xanh lá cho trạng thái hoàn thành
+  },
+  DISABLE: {
+    key: 'DISABLE',
+    value: 'Tạm dừng',
+    bgColor: 'bg-gray-400', // Màu cam cho trạng thái thất bại
   },
 };
 
