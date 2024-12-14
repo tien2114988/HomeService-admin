@@ -27,7 +27,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
         <div className="grid grid-cols-4 gap-4 text-gray-600">
           <div>
             <span className="font-medium">Ngày tạo:</span>{' '}
-            {moment(normalizeCreatedAt(user.createdAt))?.format(
+            {moment(normalizeCreatedAt(user.createdAt)).format(
               'DD/MM/YYYY HH:mm:ss',
             )}
           </div>

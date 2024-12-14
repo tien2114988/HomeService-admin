@@ -108,7 +108,7 @@ const PostTable: React.FC<PostTableProps> = ({ posts, loading }) => {
       ),
       cell: ({ row }) => (
         <div className="lowercase">
-          {moment(normalizeCreatedAt(row.getValue('createdAt')))?.format(
+          {moment(normalizeCreatedAt(row.getValue('createdAt'))).format(
             'DD/MM/YYYY HH:mm:ss',
           )}
         </div>

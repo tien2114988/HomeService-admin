@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,16 +15,27 @@ import TakePostStatusBadge from './TakePostStatusBadge';
 import { useNavigate } from 'react-router-dom';
 import { UserModel } from '@/models/User';
 import { TakePostStatus } from '@/lib/constant';
+import { getFreelancersByPostId } from '@/services/postService';
 
 interface FreelancerInfoProps {
   post: PostModel;
 }
 
 const FreelancerInfo: React.FC<FreelancerInfoProps> = ({ post }) => {
+  const [takePosts, setTakePosts] = useState<TakePostModel[]>([]);
   const [selectedTakePost, setSelectedTakePost] =
     useState<TakePostModel | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchTakePosts = async () => {
+      const data = await getFreelancersByPostId(post.id);
+      setTakePosts(data.items);
+    };
+    fetchTakePosts();
+  }, []);
 
   const openModal = (takePost: TakePostModel) => {
     setSelectedTakePost(takePost);
@@ -37,13 +48,10 @@ const FreelancerInfo: React.FC<FreelancerInfoProps> = ({ post }) => {
   };
 
   const navigateToFreelancer = (freelancer: UserModel) => {
-    navigate(`/users/${freelancer.id}`, {
-      state: { user: freelancer },
-    });
+    navigate(`/users/${freelancer.id}`);
   };
 
-  // Sắp xếp địa chỉ mặc định lên đầu
-  const sortedTakePosts = [...post.freelancerTakePosts].sort((a, b) => {
+  const sortedTakePosts = [...takePosts].sort((a, b) => {
     const priorityA =
       TakePostStatus[a.status as keyof typeof TakePostStatus].priority;
     const priorityB =

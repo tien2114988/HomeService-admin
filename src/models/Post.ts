@@ -31,6 +31,7 @@ export interface TakePostModel {
   id: string;
   status: string;
   freelancer: UserModel;
+  post: PostModel;
   createdAt: number[]; // [Year, Month, Day, Hour, Minute, Second, Millisecond]
   updatedAt: number[];
 }

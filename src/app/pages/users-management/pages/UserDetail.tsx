@@ -1,5 +1,5 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { UserModel } from '@/models/User';
 import UserInfo from '../components/UserInfo';
 import { Img } from 'react-image';
@@ -8,11 +8,24 @@ import { UserRole } from '@/lib/constant';
 import UserPosts from '../components/UserPosts';
 import BreadCrumb from '@/app/layout/components/breadcrumb/BreadCrumb';
 import ProvidingWork from '../components/ProvidingWork';
+import { getUserById } from '@/services/userService';
 
 const UserDetail: React.FC = () => {
-  const location = useLocation();
-  const state = location.state as { user: UserModel };
-  const user = state?.user;
+  const { id } = useParams();
+  const [user, setUser] = useState<UserModel>();
+  // const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      // setLoading(true); // Start loading
+      if (id) {
+        const data = await getUserById(id);
+        setUser(data.items);
+      }
+      // setLoading(false); // End loading
+    };
+    fetchUser();
+  }, []);
 
   if (!user) {
     return (
@@ -67,7 +80,7 @@ const UserDetail: React.FC = () => {
             </TabsContent>
           )}
           <TabsContent value="post">
-            <UserPosts userId={user.id} />
+            <UserPosts userId={user.id} userRole={user.role} />
           </TabsContent>
         </Tabs>
       </div>

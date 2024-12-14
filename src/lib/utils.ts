@@ -6,9 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function normalizeCreatedAt(createdAt: number[]): number[] {
+  const returnDate = [...createdAt];
   if (createdAt[6]) {
-    createdAt[6] = 0;
+    returnDate.pop();
   }
+  returnDate[1] -= 1;
 
-  return createdAt;
+  return returnDate;
 }

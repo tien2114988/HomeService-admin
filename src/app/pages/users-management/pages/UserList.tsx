@@ -60,9 +60,7 @@ const UserList = () => {
   const navigate = useNavigate();
 
   const viewUser = (user: UserModel) => {
-    navigate(`/users/${user.id}`, {
-      state: { user },
-    });
+    navigate(`/users/${user.id}`);
   };
 
   const openUpdateStatus = (user: UserModel, status: string) => {

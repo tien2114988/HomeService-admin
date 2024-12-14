@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { getPostsByUserId } from '@/services/postService';
 import { PostModel } from '@/models/Post';
 
 import PostTable from '../../posts/components/PostTable';
+import { UserRole } from '@/lib/constant';
+import {
+  getPostsByCustomerId,
+  getPostsByFreelancerId,
+} from '@/services/postService';
 
 interface UserPostsProps {
   userId: string;
+  userRole: string;
 }
 
-const UserPosts: React.FC<UserPostsProps> = ({ userId }) => {
+const UserPosts: React.FC<UserPostsProps> = ({ userId, userRole }) => {
   const [posts, setPosts] = useState<PostModel[]>([]);
   const [loading, setLoading] = useState(true); // State to track loading
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true); // Start loading
-      const data = await getPostsByUserId(userId);
-      setPosts(data.items);
+      if (userRole === UserRole.CUSTOMER) {
+        const data = await getPostsByCustomerId(userId);
+        setPosts(data.items);
+      } else {
+        const data = await getPostsByFreelancerId(userId);
+        setPosts(data.items.map(takePost => takePost.post));
+      }
+
       setLoading(false); // End loading
     };
 

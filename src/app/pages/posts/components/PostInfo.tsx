@@ -21,9 +21,7 @@ const PostInfo: React.FC<PostInfoProps> = ({ post }) => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigateToCustomer = () => {
-    navigate(`/users/${post.customer.id}`, {
-      state: { user: post.customer },
-    });
+    navigate(`/users/${post.customer.id}`);
   };
 
   const openModal = () => {

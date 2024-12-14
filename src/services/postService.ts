@@ -1,16 +1,44 @@
 // userService.ts
 import axiosInstance from '@/config/axiosConfig';
-import { PostModel } from '@/models/Post';
+import { PostModel, TakePostModel } from '@/models/Post';
 import { ApiResponse } from '@/models/User';
 
 const baseUrl = '/posts';
 
-export const getPostsByUserId = async (
+export const getPostsByCustomerId = async (
   userId: string,
 ): Promise<ApiResponse<PostModel[]>> => {
   try {
     const response: ApiResponse<PostModel[]> = await axiosInstance.get(
-      `${baseUrl}/users/${userId}`,
+      `${baseUrl}/customers/${userId}`,
+    );
+    return response; // Trả về dữ liệu phản hồi đã được ép kiểu
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
+  }
+};
+
+export const getPostsByFreelancerId = async (
+  userId: string,
+): Promise<ApiResponse<TakePostModel[]>> => {
+  try {
+    const response: ApiResponse<TakePostModel[]> = await axiosInstance.get(
+      `${baseUrl}/freelancers/${userId}`,
+    );
+    return response; // Trả về dữ liệu phản hồi đã được ép kiểu
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
+  }
+};
+
+export const getFreelancersByPostId = async (
+  postId: string,
+): Promise<ApiResponse<TakePostModel[]>> => {
+  try {
+    const response: ApiResponse<TakePostModel[]> = await axiosInstance.get(
+      `${baseUrl}/${postId}/freelancers`,
     );
     return response; // Trả về dữ liệu phản hồi đã được ép kiểu
   } catch (error) {

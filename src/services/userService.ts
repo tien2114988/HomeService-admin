@@ -17,6 +17,20 @@ export const getUsers = async (): Promise<ApiResponse<UserModel[]>> => {
   }
 };
 
+export const getUserById = async (
+  id: string,
+): Promise<ApiResponse<UserModel>> => {
+  try {
+    const response: ApiResponse<UserModel> = await axiosInstance.get(
+      `${baseUrl}/${id}`,
+    );
+    return response; // Trả về dữ liệu phản hồi đã được ép kiểu
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
+  }
+};
+
 // Hàm gọi API để cập nhật thông tin người dùng
 export const updateUser = async (userId: string, userData: object) => {
   try {
