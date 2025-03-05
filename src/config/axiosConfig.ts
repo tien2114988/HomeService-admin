@@ -3,14 +3,20 @@ import axios from 'axios';
 
 // URL cơ sở của API, bạn có thể thay đổi tùy vào backend của bạn
 const API_BASE_URL = import.meta.env.VITE_API_URL;
+const getJwtFromCookies = () => {
+  const cookies = document.cookie.split('; ');
+  const jwtCookie = cookies.find(row => row.startsWith('jwt='));
+  return jwtCookie ? jwtCookie.split('=')[1] : null;
+};
 
+// Lấy JWT từ cookie
+const jwtToken = getJwtFromCookies();
 // Tạo instance axios với cấu hình mặc định
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
     // Nếu bạn sử dụng token trong header, thêm ở đây
-    // 'Authorization': `Bearer ${token}`,
   },
 });
 
@@ -18,10 +24,9 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   config => {
     // Ví dụ: Thêm token vào request nếu cần
-    // const token = getAuthToken();
-    // if (token) {
-    //   config.headers['Authorization'] = `Bearer ${token}`;
-    // }
+    if (jwtToken) {
+      config.headers['Authorization'] = `Bearer ${jwtToken}`;
+    }
     return config;
   },
   error => {

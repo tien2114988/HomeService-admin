@@ -54,10 +54,12 @@ export const updateRequest = async (
   data: object,
 ): Promise<ApiResponse<FreelancerWorkModel>> => {
   try {
-    const response: ApiResponse<FreelancerWorkModel> = await axiosInstance.put(
-      `${baseUrl}/${workId}/freelancers/${freelancerId}`,
-      data,
-    );
+    console.log(workId, freelancerId);
+    const response: ApiResponse<FreelancerWorkModel> =
+      await axiosInstance.patch(
+        `${baseUrl}/${workId}/freelancers/${freelancerId}`,
+        data,
+      );
     return response; // Trả về dữ liệu phản hồi đã được ép kiểu
   } catch (error) {
     console.error('Error fetching user data:', error);

@@ -5,8 +5,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const [, , remove] = useCookies(['jwt']);
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    remove('jwt');
+    navigate('/auth/login');
+  };
   return (
     <nav className="sticky z-50 top-0 bg-teal-600 border-b border-gray-200 shadow-sm w-full flex justify-between items-center px-4 py-2">
       <div className="flex items-center justify-between">
@@ -22,6 +30,7 @@ const Header = () => {
             <button
               className="text-white hover:text-gray-300 focus:outline-none"
               aria-label="Logout"
+              onClick={handleLogout}
             >
               <LogOut size={20} />
             </button>
