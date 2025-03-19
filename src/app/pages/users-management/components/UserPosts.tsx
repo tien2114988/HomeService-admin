@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { PostModel } from '@/models/Post';
+import React, { useEffect, useState } from "react";
+import { PostModel } from "@/models/Post";
 
-import PostTable from '../../posts/components/PostTable';
-import { UserRole } from '@/lib/constant';
+import PostTable from "../../posts/components/PostTable";
+import { UserRole } from "@/lib/constant";
 import {
-  getPostsByCustomerId,
-  getPostsByFreelancerId,
-} from '@/services/postService';
+  useGetPostsByCustomerIdQuery,
+  useGetPostsByFreelancerIdQuery,
+} from "@/app/api/postApi";
+import { toast } from "@/hooks/use-toast";
 
 interface UserPostsProps {
   userId: string;
@@ -14,25 +15,34 @@ interface UserPostsProps {
 }
 
 const UserPosts: React.FC<UserPostsProps> = ({ userId, userRole }) => {
-  const [posts, setPosts] = useState<PostModel[]>([]);
-  const [loading, setLoading] = useState(true); // State to track loading
+  let posts: PostModel[] = [];
+  let loading;
+  let error;
+  let res;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); // Start loading
-      if (userRole === UserRole.CUSTOMER) {
-        const data = await getPostsByCustomerId(userId);
-        setPosts(data.items);
-      } else {
-        const data = await getPostsByFreelancerId(userId);
-        setPosts(data.items.map(takePost => takePost.post));
-      }
+  if (userRole === UserRole.CUSTOMER) {
+    const { data, isFetching, isError } = useGetPostsByCustomerIdQuery(userId);
+    error = isError;
+    posts = data?.items && !error ? data.items : [];
+    loading = isFetching;
+    res = data;
+  } else {
+    const { data, isFetching, isError } =
+      useGetPostsByFreelancerIdQuery(userId);
+    error = isError;
+    loading = isFetching;
+    posts =
+      data?.items && !error ? data?.items.map((takePost) => takePost.post) : [];
+    res = data;
+  }
 
-      setLoading(false); // End loading
-    };
-
-    fetchData();
-  }, []);
+  if (error) {
+    toast({
+      title: "Thất bại",
+      description: res?.message || "Lỗi không xác định",
+      variant: "destructive",
+    });
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-xl p-6">

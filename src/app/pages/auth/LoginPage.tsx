@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Loader2, Lock, User } from 'lucide-react';
-import { login } from '@/services/authService';
-import { LoginModel } from '@/models/Auth';
-import { toast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
-import { Toaster } from '@/components/ui/toaster';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Loader2, Lock, User } from "lucide-react";
+import { LoginModel } from "@/models/Auth";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { useAppDispatch } from "@/app/hooks";
+import { userLoggedIn } from "@/app/modules/auth/authSlice";
+import { useLoginMutation } from "@/app/api/authApi";
 
 const loginSchema = z.object({
   username: z.string(),
@@ -27,27 +28,21 @@ const LoginPage: React.FC = () => {
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [, setCookie] = useCookies(['jwt']);
+  const [login, { isLoading }] = useLoginMutation();
 
   const onSubmit = async (data: LoginModel) => {
-    console.log(data);
-    setLoading(true);
     const res = await login(data);
-    setLoading(false);
 
-    console.log(res);
-
-    if (res.returnCode == 1000) {
-      setCookie('jwt', res.items.jwt);
-      console.log(res.items.jwt);
-      navigate('/dashboard');
+    if (!res.error) {
+      dispatch(userLoggedIn({ username: data.username, ...res.data.items }));
+      navigate("/dashboard");
     } else {
       toast({
-        title: 'Thất bại',
-        description: res.message,
-        variant: 'destructive',
+        title: "Thất bại",
+        description: "Đăng nhập thất bại",
+        variant: "destructive",
       });
     }
   };
@@ -84,7 +79,7 @@ const LoginPage: React.FC = () => {
                     id="username"
                     type="text"
                     className="pl-10 dark:bg-gray-700 dark:text-white"
-                    {...register('username')}
+                    {...register("username")}
                   />
                 </div>
                 {errors.username && (
@@ -108,7 +103,7 @@ const LoginPage: React.FC = () => {
                     id="password"
                     type="password"
                     className="pl-10 dark:bg-gray-700 dark:text-white"
-                    {...register('password')}
+                    {...register("password")}
                   />
                 </div>
                 {errors.password && (
@@ -124,7 +119,7 @@ const LoginPage: React.FC = () => {
                 className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
               >
                 Đăng Nhập
-                {loading && <Loader2 className="animate-spin" />}
+                {isLoading && <Loader2 className="animate-spin" />}
               </Button>
             </form>
           </CardContent>

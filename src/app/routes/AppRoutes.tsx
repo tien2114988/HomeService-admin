@@ -1,24 +1,22 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import App from '@/app/App';
-import { ErrorsPage } from '@/app/modules/errors/ErrorsPage';
-import { Logout } from '@/app/modules/auth/Logout';
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import App from "@/app/App";
+import { ErrorsPage } from "@/app/modules/errors/ErrorsPage";
+import { Logout } from "@/app/modules/auth/Logout";
 // import { useAuth } from "../modules/auth/core/Auth";
-import PrivateRoutes from './PrivateRoutes';
-import LoginPage from '../pages/auth/LoginPage';
-import { useCookies } from 'react-cookie';
+import PrivateRoutes from "./PrivateRoutes";
+import LoginPage from "../pages/auth/LoginPage";
+import { useAppSelector } from "../hooks";
 
-const { BASE_URL = '/' } = import.meta.env;
 const AppRoutes = () => {
-  const [cookies] = useCookies(['jwt']);
-  console.log(cookies.jwt);
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   return (
-    <BrowserRouter basename={BASE_URL}>
+    <BrowserRouter>
       <Routes>
         <Route element={<App />}>
           <Route path="error/*" element={<ErrorsPage />} />
           <Route path="logout" element={<Logout />} />
-          {!cookies.jwt ? (
+          {!isAuthenticated ? (
             <>
               <Route path="auth/*" element={<LoginPage />} />
               <Route path="*" element={<Navigate to="/auth/login" replace />} />
@@ -26,7 +24,7 @@ const AppRoutes = () => {
           ) : (
             <>
               <Route path="/*" element={<PrivateRoutes />} />
-              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route index element={<Navigate to="/users" replace />} />
             </>
           )}
         </Route>

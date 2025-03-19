@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 
-import BreadCrumb from '@/app/layout/components/breadcrumb/BreadCrumb';
-import { Img } from 'react-image';
-import { FreelancerWorkStatus, ReturnCode, WorkType } from '@/lib/constant';
+import BreadCrumb from "@/app/layout/components/breadcrumb/BreadCrumb";
+import { Img } from "react-image";
+import { FreelancerWorkStatus, WorkType } from "@/lib/constant";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import moment from 'moment';
-import { normalizeCreatedAt } from '@/lib/utils';
-import RequestInfo from '../components/RequestInfo';
-import { FreelancerWorkModel } from '@/models/Work';
-import FreelancerWorkStatusBadge from '../components/FreelancerWorkStatusBadge';
-import TestResult from '../components/TestResult';
-import { Button } from '@/components/ui/button';
-import { updateRequest } from '@/services/workService';
-import { toast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import moment from "moment";
+import { normalizeCreatedAt } from "@/lib/utils";
+import RequestInfo from "../components/RequestInfo";
+import { FreelancerWorkModel } from "@/models/Work";
+import FreelancerWorkStatusBadge from "../components/FreelancerWorkStatusBadge";
+import TestResult from "../components/TestResult";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import { useUpdateRequestMutation } from "@/app/api/workApi";
 
 const RequestDetail: React.FC = () => {
   const location = useLocation();
   const state = location.state as { request: FreelancerWorkModel };
   const [request, setRequest] = useState<FreelancerWorkModel>(state?.request);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [mode, setMode] = useState<string>('');
+  const [mode, setMode] = useState<string>("");
+  const [updateRequest, { isLoading, isError }] = useUpdateRequestMutation();
 
   if (!request) {
     return (
@@ -39,21 +39,19 @@ const RequestDetail: React.FC = () => {
       status,
     };
     setMode(status);
-    setLoading(true);
-    const res = await updateRequest(workId, freelancerId, data);
-    setLoading(false);
-    if (res.returnCode === ReturnCode.SUCCESS) {
-      setRequest(res.items);
+    const res = await updateRequest({ workId, freelancerId, data });
+    if (!isError && res.data) {
+      setRequest(res.data?.items);
       toast({
-        title: 'Thành công',
-        description: 'Cập nhật trạng thái thành công',
-        variant: 'success',
+        title: "Thành công",
+        description: "Cập nhật trạng thái thành công",
+        variant: "success",
       });
     } else {
       toast({
-        title: 'Thất bại',
-        description: res.message,
-        variant: 'destructive',
+        title: "Thất bại",
+        description: "Cập nhật trạng thái thất bại",
+        variant: "destructive",
       });
     }
   };
@@ -62,8 +60,8 @@ const RequestDetail: React.FC = () => {
     <>
       <BreadCrumb
         links={[
-          { label: 'Các đơn công việc', href: '/requests/' },
-          { label: `${request.id}`, href: '' },
+          { label: "Các đơn công việc", href: "/requests/" },
+          { label: `${request.id}`, href: "" },
         ]}
       />
       <div className="min-h-screen space-y-5">
@@ -90,15 +88,15 @@ const RequestDetail: React.FC = () => {
           </div>
           <div>
             <div>
-              <span className="font-medium">Ngày gửi đăng ký:</span>{' '}
+              <span className="font-medium">Ngày gửi đăng ký:</span>{" "}
               {moment(normalizeCreatedAt(request.createdAt))?.format(
-                'DD/MM/YYYY HH:mm:ss',
+                "DD/MM/YYYY HH:mm:ss"
               )}
             </div>
             <div>
-              <span className="font-medium">Lần cập nhật cuối:</span>{' '}
+              <span className="font-medium">Lần cập nhật cuối:</span>{" "}
               {moment(normalizeCreatedAt(request.updatedAt))?.format(
-                'DD/MM/YYYY HH:mm:ss',
+                "DD/MM/YYYY HH:mm:ss"
               )}
             </div>
           </div>
@@ -115,39 +113,38 @@ const RequestDetail: React.FC = () => {
             <TestResult request={request} />
           </TabsContent>
         </Tabs>
-        <div className="flex flex-row justify-end space-x-2">
-          <Button
-            disabled={
-              loading ||
-              request.status === FreelancerWorkStatus.DISABLE.key ||
-              request.status === FreelancerWorkStatus.WORK.key
-            }
-            variant="destructive"
-            onClick={() =>
-              handleUpdateRequest(FreelancerWorkStatus.DISABLE.key)
-            }
-          >
-            Từ chối
-            {loading && mode === FreelancerWorkStatus.DISABLE.key && (
-              <Loader2 className="animate-spin" />
-            )}
-          </Button>
 
-          <Button
-            disabled={
-              loading ||
-              request.status === FreelancerWorkStatus.DISABLE.key ||
-              request.status === FreelancerWorkStatus.WORK.key
-            }
-            variant="success"
-            onClick={() => handleUpdateRequest(FreelancerWorkStatus.WORK.key)}
-          >
-            Xét duyệt
-            {loading && mode === FreelancerWorkStatus.WORK.key && (
-              <Loader2 className="animate-spin" />
-            )}
-          </Button>
-        </div>
+        {request.status !== FreelancerWorkStatus.WORK.key && (
+          <div className="flex flex-row justify-end space-x-2">
+            <Button
+              disabled={
+                isLoading || request.status === FreelancerWorkStatus.DISABLE.key
+              }
+              variant="destructive"
+              onClick={() =>
+                handleUpdateRequest(FreelancerWorkStatus.DISABLE.key)
+              }
+            >
+              Từ chối
+              {isLoading && mode === FreelancerWorkStatus.DISABLE.key && (
+                <Loader2 className="animate-spin" />
+              )}
+            </Button>
+
+            <Button
+              disabled={
+                isLoading || request.status === FreelancerWorkStatus.DISABLE.key
+              }
+              variant="success"
+              onClick={() => handleUpdateRequest(FreelancerWorkStatus.WORK.key)}
+            >
+              Xét duyệt
+              {isLoading && mode === FreelancerWorkStatus.WORK.key && (
+                <Loader2 className="animate-spin" />
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

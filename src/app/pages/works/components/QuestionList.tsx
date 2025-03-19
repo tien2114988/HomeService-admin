@@ -1,60 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import { ChoiceModel, QuestionModel, TestModel } from '@/models/Work';
-import { Input } from '@/components/ui/input'; // Shadcn Input
-import { Button } from '@/components/ui/button'; // Shadcn Button
-import { toast } from '@/hooks/use-toast';
-import { ClipLoader } from 'react-spinners';
-import { Card } from '@/components/ui/card';
-import QuestionTypeBadge from './QuestionTypeBadge';
+import React, { useState } from "react";
+import { ChoiceModel, QuestionModel, TestModel } from "@/models/Work";
+import { Input } from "@/components/ui/input"; // Shadcn Input
+import { Button } from "@/components/ui/button"; // Shadcn Button
+import { toast } from "@/hooks/use-toast";
+import { ClipLoader } from "react-spinners";
+import { Card } from "@/components/ui/card";
+import QuestionTypeBadge from "./QuestionTypeBadge";
 import {
   DialogHeader,
   DialogFooter,
   DialogContent,
   DialogTitle,
   Dialog,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
+import { Edit, Trash2, CircleCheckBig } from "lucide-react";
+import { QuestionType } from "@/lib/constant";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  addQuestion,
-  deleteQuestion,
-  getQuestions,
-  updateQuestion,
-} from '@/services/testService';
-import { Edit, Trash2, CircleCheckBig } from 'lucide-react';
-import { QuestionType } from '@/lib/constant';
-import { Skeleton } from '@/components/ui/skeleton';
+  useAddQuestionMutation,
+  useDeleteQuestionMutation,
+  useGetQuestionsQuery,
+  useUpdateQuestionMutation,
+} from "@/app/api/testApi";
 
 interface QuestionListProps {
   test: TestModel;
 }
 
 const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
-  const [saveLoading, setSaveLoading] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [edit, setEdit] = useState<boolean>(false);
   const [showAddQuestionDialog, setShowAddQuestionDialog] = useState(false);
   const [showDeleteQuestionDialog, setShowDeleteQuestionDialog] =
     useState(false);
   const [newQuestion, setNewQuestion] = useState<Partial<QuestionModel>>({
-    content: '',
-    type: 'MULTICHOICE',
+    content: "",
+    type: "MULTICHOICE",
   });
-  const [deleteQuestionId, setDeleteQuestionId] = useState<string>('');
-  const [questions, setQuestions] = useState<QuestionModel[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [deleteQuestionId, setDeleteQuestionId] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const { data, isFetching, isError } = useGetQuestionsQuery(test.id);
+  const [addQuestion, { isLoading: isAddLoading, isError: isAddError }] =
+    useAddQuestionMutation();
+  const [
+    updateQuestion,
+    { isLoading: isUpdateLoading, isError: isUpdateError },
+  ] = useUpdateQuestionMutation();
+  const [
+    deleteQuestion,
+    { isLoading: isDeleteLoading, isError: isDeleteError },
+  ] = useDeleteQuestionMutation();
+  const questions = data?.items || [];
+  const saveLoading = isAddLoading || isUpdateLoading || isDeleteLoading;
 
-  const [newOption, setNewOption] = useState<string>('');
+  const [newOption, setNewOption] = useState<string>("");
 
   const handleAddOption = () => {
     if (newOption.trim()) {
       const newChoice: ChoiceModel = {
-        id: '_' + Date.now().toString(),
+        id: "_" + Date.now().toString(),
         content: newOption.trim(),
         deleted: false,
         answer: false,
@@ -64,54 +74,36 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
         newChoice,
       ];
       setNewQuestion({ ...newQuestion, choices: updatedChoices });
-      setNewOption('');
+      setNewOption("");
     }
   };
 
   const handleSetAnswer = (id?: string) => {
     const updatedChoices =
-      newQuestion.choices?.map(choice =>
+      newQuestion.choices?.map((choice) =>
         choice.id === id
           ? { ...choice, answer: true }
-          : { ...choice, answer: false },
+          : { ...choice, answer: false }
       ) || [];
     setNewQuestion({ ...newQuestion, choices: updatedChoices });
   };
 
   const handleDeleteOption = (id?: string) => {
     let updatedChoices;
-    if (id?.startsWith('_')) {
+    if (id?.startsWith("_")) {
       updatedChoices =
-        newQuestion.choices?.filter(choice => choice.id !== id) || [];
+        newQuestion.choices?.filter((choice) => choice.id !== id) || [];
     } else {
       updatedChoices =
-        newQuestion.choices?.map(choice =>
-          choice.id === id ? { ...choice, deleted: true } : choice,
+        newQuestion.choices?.map((choice) =>
+          choice.id === id ? { ...choice, deleted: true } : choice
         ) || [];
     }
     setNewQuestion({ ...newQuestion, choices: updatedChoices });
   };
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setLoading(true);
-      const res = await getQuestions(test.id);
-      setLoading(false);
-      if (res.returnCode == 1000) {
-        setQuestions(res.items);
-      } else {
-        toast({
-          title: 'Tải câu hỏi thất bại',
-          description: res.message,
-          variant: 'destructive',
-        });
-      }
-    };
-    fetchQuestions();
-  }, []);
-
   const handleAddQuestion = () => {
-    setNewQuestion({ content: '', type: 'MULTICHOICE' });
+    setNewQuestion({ content: "", type: "MULTICHOICE" });
     setEdit(false);
     setShowAddQuestionDialog(true);
   };
@@ -123,22 +115,22 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
   };
 
   const handleDeleteQuestion = async () => {
-    setSaveLoading(true);
-    const res = await deleteQuestion(deleteQuestionId);
-    setSaveLoading(false);
-    if (res.returnCode == 1000) {
-      const updatedQuestions = questions.filter(q => q.id !== deleteQuestionId);
-      setQuestions(updatedQuestions);
+    await deleteQuestion({ id: deleteQuestionId, testId: test.id });
+    if (!isDeleteError) {
+      // const updatedQuestions = questions.filter(
+      //   (q) => q.id !== deleteQuestionId
+      // );
+      // setQuestions(updatedQuestions);
       toast({
-        title: 'Thành công',
-        description: 'Xóa câu hỏi thành công',
-        variant: 'success',
+        title: "Thành công",
+        description: "Xóa câu hỏi thành công",
+        variant: "success",
       });
     } else {
       toast({
-        title: 'Thất bại',
-        description: res.message,
-        variant: 'destructive',
+        title: "Thất bại",
+        description: "Xóa câu hỏi thất bại",
+        variant: "destructive",
       });
     }
     setShowDeleteQuestionDialog(false);
@@ -151,11 +143,11 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
 
   const handleSaveQuestion = async () => {
     const newQuestionData =
-      newQuestion.type === QuestionType['MULTICHOICE'].key
+      newQuestion.type === QuestionType["MULTICHOICE"].key
         ? {
             ...newQuestion,
-            choices: newQuestion.choices?.map(choice =>
-              choice.id?.startsWith('_') ? { ...choice, id: null } : choice,
+            choices: newQuestion.choices?.map((choice) =>
+              choice.id?.startsWith("_") ? { ...choice, id: null } : choice
             ),
           }
         : {
@@ -167,57 +159,62 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
 
     if (edit && newQuestionData.id) {
       // Update existing question
-      setSaveLoading(true);
       const { id, ...updatedData } = newQuestionData;
-      const res = await updateQuestion(id, updatedData);
-      setSaveLoading(false);
+      await updateQuestion({ id, testId: test.id, data: updatedData });
 
-      if (res.returnCode == 1000) {
-        const updatedQuestions = questions.map(q =>
-          q.id === res.items.id ? { ...res.items } : q,
-        );
+      if (!isUpdateError) {
+        // const updatedQuestions = questions.map((q) =>
+        //   q.id === res.items.id ? { ...res.items } : q
+        // );
 
-        setQuestions(updatedQuestions);
+        // setQuestions(updatedQuestions);
         toast({
-          title: 'Thành công',
-          description: 'Cập nhật câu hỏi thành công',
-          variant: 'success',
+          title: "Thành công",
+          description: "Cập nhật câu hỏi thành công",
+          variant: "success",
         });
       } else {
-        console.log(res.message);
         toast({
-          title: 'Cập nhật câu hỏi thất bại',
-          description: res.message,
-          variant: 'destructive',
+          title: "Thất bại",
+          description: "Cập nhật câu hỏi thất bại",
+          variant: "destructive",
         });
       }
     } else {
-      setSaveLoading(true);
-      const res = await addQuestion(test.id, newQuestionData);
-      setSaveLoading(false);
+      await addQuestion({
+        testId: test.id,
+        data: newQuestionData,
+      });
 
-      if (res.returnCode == 1000) {
-        setQuestions([...questions, res.items]);
+      if (!isAddError) {
+        // setQuestions([...questions, res.items]);
         toast({
-          title: 'Thành công',
-          description: 'Thêm câu hỏi thành công',
-          variant: 'success',
+          title: "Thành công",
+          description: "Thêm câu hỏi thành công",
+          variant: "success",
         });
       } else {
-        console.log(res.message);
         toast({
-          title: 'Thêm câu hỏi thất bại',
-          description: res.message,
-          variant: 'destructive',
+          title: "Thất bại",
+          description: "Thêm câu hỏi thất bại",
+          variant: "destructive",
         });
       }
     }
     setShowAddQuestionDialog(false);
   };
 
-  const filteredQuestions = questions.filter(q =>
-    q.content.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredQuestions = questions.filter((q) =>
+    q.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (isError) {
+    toast({
+      title: "Tải câu hỏi thất bại",
+      description: data?.message,
+      variant: "destructive",
+    });
+  }
 
   return (
     <>
@@ -228,11 +225,11 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
         <Input
           placeholder="Tìm kiếm câu hỏi..."
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-4 w-1/2"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {loading ? (
+          {isFetching ? (
             Array.from({ length: 3 }).map((_, index) => (
               <SkeletonQuestion key={index} /> // Hiển thị skeleton khi đang load
             ))
@@ -282,7 +279,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-center">
-              {edit ? 'Sửa câu hỏi' : 'Thêm câu hỏi'}
+              {edit ? "Sửa câu hỏi" : "Thêm câu hỏi"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -292,7 +289,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
               </label>
               <Select
                 value={newQuestion.type}
-                onValueChange={value =>
+                onValueChange={(value) =>
                   setNewQuestion({ ...newQuestion, type: value })
                 }
               >
@@ -301,10 +298,10 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="MULTICHOICE">
-                    {QuestionType['MULTICHOICE'].value}
+                    {QuestionType["MULTICHOICE"].value}
                   </SelectItem>
                   <SelectItem value="ESSAY">
-                    {QuestionType['ESSAY'].value}
+                    {QuestionType["ESSAY"].value}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -314,14 +311,14 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
                 Nội dung
               </label>
               <Input
-                value={newQuestion.content || ''}
-                onChange={e =>
+                value={newQuestion.content || ""}
+                onChange={(e) =>
                   setNewQuestion({ ...newQuestion, content: e.target.value })
                 }
                 placeholder="Nhập nội dung câu hỏi"
               />
             </div>
-            {newQuestion.type === 'MULTICHOICE' && (
+            {newQuestion.type === "MULTICHOICE" && (
               <div className="space-y-2">
                 <div className="font-medium text-gray-700">
                   Danh sách lựa chọn
@@ -330,21 +327,21 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
                   {newQuestion.choices &&
                     newQuestion.choices.length > 0 &&
                     newQuestion.choices
-                      .filter(option => !option.deleted)
-                      .map(option => (
+                      .filter((option) => !option.deleted)
+                      .map((option) => (
                         <div
                           key={option.id}
                           className="flex items-center justify-between space-x-2"
                         >
                           <Input
                             value={option.content}
-                            onChange={e =>
+                            onChange={(e) =>
                               setNewQuestion({
                                 ...newQuestion,
-                                choices: newQuestion.choices?.map(o =>
+                                choices: newQuestion.choices?.map((o) =>
                                   o.id === option.id
                                     ? { ...o, content: e.target.value }
-                                    : o,
+                                    : o
                                 ),
                               })
                             }
@@ -373,7 +370,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ test }) => {
                   <Input
                     placeholder="Thêm lựa chọn mới"
                     value={newOption}
-                    onChange={e => setNewOption(e.target.value)}
+                    onChange={(e) => setNewOption(e.target.value)}
                   />
                   <Button className="bg-gray-500" onClick={handleAddOption}>
                     Thêm

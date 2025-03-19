@@ -1,19 +1,20 @@
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import { LogOut } from 'lucide-react';
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { LogOut } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useCookies } from 'react-cookie';
-import { useNavigate } from 'react-router-dom';
+} from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "@/app/hooks";
+import { userLoggedOut } from "@/app/modules/auth/authSlice";
 
 const Header = () => {
-  const [, , remove] = useCookies(['jwt']);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const handleLogout = () => {
-    remove('jwt');
-    navigate('/auth/login');
+    dispatch(userLoggedOut());
+    navigate("/auth/login");
   };
   return (
     <nav className="sticky z-50 top-0 bg-teal-600 border-b border-gray-200 shadow-sm w-full flex justify-between items-center px-4 py-2">

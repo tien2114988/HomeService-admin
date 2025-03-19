@@ -1,34 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { getAllWorks } from '@/services/workService';
-import { WorkModel } from '@/models/Work';
+import React from "react";
+import { WorkModel } from "@/models/Work";
 import {
   Card,
   CardHeader,
   CardContent,
   CardFooter,
-} from '@/components/ui/card'; // Cấu trúc shadcn card
-import { Skeleton } from '@/components/ui/skeleton';
-import { Img } from 'react-image';
-import { WorkType } from '@/lib/constant';
-import { User, ClipboardList } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+} from "@/components/ui/card"; // Cấu trúc shadcn card
+import { Skeleton } from "@/components/ui/skeleton";
+import { Img } from "react-image";
+import { WorkType } from "@/lib/constant";
+import { User, ClipboardList } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useGetAllWorksQuery } from "@/app/api/workApi";
+import { toast } from "@/hooks/use-toast";
 
 const WorkList: React.FC = () => {
-  const [works, setWorks] = useState<WorkModel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isFetching, isError } = useGetAllWorksQuery();
+  const works = data?.items ?? [];
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); // Bắt đầu loading
-      const data = await getAllWorks();
-      setWorks(data.items);
-      setLoading(false); // Kết thúc loading
-    };
-
-    fetchData();
-  }, []);
+  if (isError) {
+    toast({
+      title: "Thất bại",
+      description: data?.message,
+      variant: "destructive",
+    });
+  }
 
   const viewWorkDetail = (work: WorkModel, request: boolean) => {
     console.log(request);
@@ -41,11 +39,11 @@ const WorkList: React.FC = () => {
     <div className="w-full">
       <div className="text-xl font-medium mb-4">Quản lý loại dịch vụ</div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {loading
+        {isFetching
           ? Array.from({ length: 6 }).map((_, index) => (
               <SkeletonCard key={index} /> // Hiển thị skeleton khi đang load
             ))
-          : works.map(work => (
+          : works.map((work) => (
               <Card
                 key={work.id}
                 onClick={() => viewWorkDetail(work, false)}
@@ -82,7 +80,7 @@ const WorkList: React.FC = () => {
                 </CardContent>
                 <CardFooter className="flex flex-row justify-end">
                   <Button
-                    onClick={event => {
+                    onClick={(event) => {
                       event.stopPropagation(); // Chặn sự kiện onClick của Card
                       viewWorkDetail(work, true);
                     }}

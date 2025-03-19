@@ -5,8 +5,8 @@ import {
   Landmark,
   ClipboardList,
   UserPlus,
-} from 'lucide-react';
-import { useLocation } from 'react-router-dom'; // Import useLocation
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom"; // Import useLocation
 
 import {
   Sidebar,
@@ -17,40 +17,40 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
+} from "@/components/ui/sidebar";
 
 // Menu items.
 const items = [
+  // {
+  //   title: "Bảng điều khiển",
+  //   url: "/dashboard",
+  //   icon: Gauge,
+  // },
   {
-    title: 'Bảng điều khiển',
-    url: '/dashboard',
-    icon: Gauge,
-  },
-  {
-    title: 'Quản lý người dùng',
-    url: '/users',
+    title: "Quản lý người dùng",
+    url: "/users",
     icon: User,
   },
   {
-    title: 'Các đơn công việc',
-    url: '/posts',
+    title: "Các đơn công việc",
+    url: "/posts",
     icon: ClipboardList,
   },
   {
-    title: 'Loại dịch vụ',
-    url: '/works',
+    title: "Loại dịch vụ",
+    url: "/works",
     icon: LayoutGrid,
   },
   {
-    title: 'Yêu cầu đăng ký',
-    url: '/requests',
+    title: "Yêu cầu đăng ký",
+    url: "/requests",
     icon: UserPlus,
   },
-  {
-    title: 'Tài khoản ngân hàng',
-    url: '/accounts',
-    icon: Landmark,
-  },
+  // {
+  //   title: "Tài khoản ngân hàng",
+  //   url: "/accounts",
+  //   icon: Landmark,
+  // },
 ];
 
 export function AppSidebar() {
@@ -72,29 +72,29 @@ export function AppSidebar() {
           {/* Content */}
           <SidebarGroupContent className="mt-4">
             <SidebarMenu>
-              {items.map(item => (
+              {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     className={`py-6 transition-colors duration-200 ${
                       location.pathname.startsWith(item.url) // Sử dụng location.pathname
-                        ? 'bg-teal-100 text-gray-600'
-                        : 'text-gray-600'
+                        ? "bg-teal-100 text-gray-600"
+                        : "text-gray-600"
                     }`}
                   >
-                    <a
-                      href={item.url}
+                    <Link
+                      to={item.url}
                       className={`flex w-full items-center ${
                         location.pathname.startsWith(item.url)
-                          ? 'pointer-events-none'
-                          : ''
+                          ? "pointer-events-none"
+                          : ""
                       }`}
                     >
                       <item.icon className="w-8 h-8 transition-transform duration-200 mr-2" />
                       <span className="w-full text-base font-medium">
                         {item.title}
                       </span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

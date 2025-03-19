@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -7,10 +7,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import {
   SortingState,
@@ -22,15 +22,16 @@ import {
   getSortedRowModel,
   flexRender,
   getFilteredRowModel,
-} from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
-import { Img } from 'react-image';
-import { normalizeCreatedAt } from '@/lib/utils';
-import moment from 'moment';
-import { FreelancerWorkModel } from '@/models/Work';
-import FreelancerWorkStatusBadge from './FreelancerWorkStatusBadge';
-import { WorkType } from '@/lib/constant';
-import { getRequests } from '@/services/workService';
+} from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+import { Img } from "react-image";
+import { normalizeCreatedAt } from "@/lib/utils";
+import moment from "moment";
+import { FreelancerWorkModel } from "@/models/Work";
+import FreelancerWorkStatusBadge from "./FreelancerWorkStatusBadge";
+import { WorkType } from "@/lib/constant";
+import { useGetRequestsQuery } from "@/app/api/workApi";
+import { toast } from "@/hooks/use-toast";
 
 interface PostTableProps {
   workId?: string;
@@ -38,27 +39,20 @@ interface PostTableProps {
 
 const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
+  const [globalFilter, setGlobalFilter] = useState("");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [requests, setRequests] = useState<FreelancerWorkModel[]>([]);
-  const [loading, setLoading] = useState(true); // State to track loading
   const navigate = useNavigate();
+  const { data, isFetching, isError } = useGetRequestsQuery(workId);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); // Start loading
-      let data;
-      if (workId) {
-        data = await getRequests(workId);
-      } else {
-        data = await getRequests();
-      }
-      setRequests(data.items);
-      setLoading(false); // End loading
-    };
+  const requests = data?.items || [];
 
-    fetchData();
-  }, []);
+  if (isError) {
+    toast({
+      title: "Thất bại",
+      description: data?.message,
+      variant: "destructive",
+    });
+  }
 
   const viewRequest = (request: FreelancerWorkModel) => {
     navigate(`/requests/${request.id}`, {
@@ -68,16 +62,16 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
 
   const columns: ColumnDef<FreelancerWorkModel>[] = [
     {
-      accessorKey: 'id',
-      header: 'Mã freelancer',
+      accessorKey: "id",
+      header: "Mã freelancer",
       cell: ({ row }) => {
         const request = row.original;
         return <div>{request.freelancer.id}</div>;
       },
     },
     {
-      accessorKey: 'freelancerName',
-      header: 'Tên freelancer',
+      accessorKey: "freelancerName",
+      header: "Tên freelancer",
       cell: ({ row }) => {
         const request = row.original;
         return (
@@ -86,7 +80,7 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
               src={
                 request.freelancer.avatar
                   ? request.freelancer.avatar
-                  : 'https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png'
+                  : "https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png"
               }
               alt="Avatar"
               width={32}
@@ -100,16 +94,16 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
       },
     },
     {
-      accessorKey: 'workId',
-      header: 'Mã dịch vụ',
+      accessorKey: "workId",
+      header: "Mã dịch vụ",
       cell: ({ row }) => {
         const request = row.original;
         return <div>{request.work.id}</div>;
       },
     },
     {
-      accessorKey: 'workName',
-      header: 'Tên dịch vụ',
+      accessorKey: "workName",
+      header: "Tên dịch vụ",
       cell: ({ row }) => {
         const request = row.original;
         return (
@@ -118,7 +112,7 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
               src={
                 request.work.image
                   ? request.work.image
-                  : 'https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png'
+                  : "https://icons.veryicon.com/png/o/miscellaneous/user-avatar/user-avatar-male-5.png"
               }
               alt="Avatar"
               width={32}
@@ -134,35 +128,35 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
       },
     },
     {
-      accessorKey: 'createdAt',
+      accessorKey: "createdAt",
       header: ({ column }) => (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Ngày tạo <ArrowUpDown />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="lowercase">
-          {row.getValue('createdAt')
-            ? moment(normalizeCreatedAt(row.getValue('createdAt')))?.format(
-                'DD/MM/YYYY HH:mm:ss',
+          {row.getValue("createdAt")
+            ? moment(normalizeCreatedAt(row.getValue("createdAt")))?.format(
+                "DD/MM/YYYY HH:mm:ss"
               )
-            : ''}
+            : ""}
         </div>
       ),
     },
     {
-      accessorKey: 'status',
-      header: 'Trạng thái đăng ký',
+      accessorKey: "status",
+      header: "Trạng thái đăng ký",
       cell: ({ row }) => (
-        <FreelancerWorkStatusBadge status={row.getValue('status')} />
+        <FreelancerWorkStatusBadge status={row.getValue("status")} />
       ),
     },
     {
-      id: 'actions',
-      header: 'Xem',
+      id: "actions",
+      header: "Xem",
       cell: ({ row }) => {
         const request = row.original;
 
@@ -202,22 +196,22 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
         <Input
           placeholder="Tìm kiếm theo ID"
           value={globalFilter}
-          onChange={e => setGlobalFilter(e.target.value)}
+          onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
         />
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-teal-50">
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
+                {headerGroup.headers.map((header) => (
                   <TableHead className="text-gray-900" key={header.id}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext(),
+                          header.getContext()
                         )}
                   </TableHead>
                 ))}
@@ -225,7 +219,7 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
             ))}
           </TableHeader>
           <TableBody>
-            {loading ? (
+            {isFetching ? (
               Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
                   {Array.from({ length: columns.length }).map(
@@ -233,18 +227,18 @@ const RequestTable: React.FC<PostTableProps> = ({ workId }) => {
                       <TableCell key={colIndex}>
                         <Skeleton className="h-5 w-full" />
                       </TableCell>
-                    ),
+                    )
                   )}
                 </TableRow>
               ))
             ) : table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map(row => (
+              table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
-                  {row.getVisibleCells().map(cell => (
+                  {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}

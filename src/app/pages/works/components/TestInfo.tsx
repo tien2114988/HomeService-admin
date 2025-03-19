@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { TestModel } from '@/models/Work';
-import { Input } from '@/components/ui/input'; // Shadcn Input
-import { Button } from '@/components/ui/button'; // Shadcn Button
-import { toast } from '@/hooks/use-toast';
-import { updateWork } from '@/services/workService';
-import { ClipLoader } from 'react-spinners';
+import React, { useState } from "react";
+import { TestModel } from "@/models/Work";
+import { Input } from "@/components/ui/input"; // Shadcn Input
+import { Button } from "@/components/ui/button"; // Shadcn Button
+import { toast } from "@/hooks/use-toast";
+import { ClipLoader } from "react-spinners";
 
-import QuestionList from './QuestionList';
+import QuestionList from "./QuestionList";
+import { useUpdateWorkMutation } from "@/app/api/workApi";
 
 interface PostInfoProps {
   workId: string;
@@ -15,10 +15,10 @@ interface PostInfoProps {
 }
 
 const TestInfo: React.FC<PostInfoProps> = ({ workId, test, setTest }) => {
-  const [testDuration, setTestDuration] = useState<number | ''>('');
-  const [passedPoint, setPassedPoint] = useState<number | ''>('');
-  const [questionCount, setQuestionCount] = useState<number | ''>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [testDuration, setTestDuration] = useState<number | "">("");
+  const [passedPoint, setPassedPoint] = useState<number | "">("");
+  const [questionCount, setQuestionCount] = useState<number | "">("");
+  const [updateWork, { isLoading, isError }] = useUpdateWorkMutation();
 
   const [edit, setEdit] = useState<boolean>(false);
 
@@ -49,27 +49,25 @@ const TestInfo: React.FC<PostInfoProps> = ({ workId, test, setTest }) => {
           questionCount: Number(questionCount),
         },
       };
-      setLoading(true);
-      const res = await updateWork(workId, data);
-      setLoading(false);
-      if (res.returnCode == 1000) {
-        setTest(res.items.test);
+      const res = await updateWork({ id: workId, data });
+      if (!isError && res.data) {
+        setTest(res.data.items.test);
         toast({
-          title: 'Thành công',
-          description: 'Cập nhật bài test thành công',
-          variant: 'success',
+          title: "Thành công",
+          description: "Cập nhật bài test thành công",
+          variant: "success",
         });
       } else {
         toast({
-          title: 'Cập nhật bài test thất bại',
-          description: res.message,
-          variant: 'destructive',
+          title: "Thất bại",
+          description: "Cập nhật bài test thất bại",
+          variant: "destructive",
         });
       }
     } else {
       toast({
-        title: 'Điền sai thông tin',
-        description: 'Các thông tin phải điền đầy đủ và lớn hơn 0 !!!!',
+        title: "Điền sai thông tin",
+        description: "Các thông tin phải điền đầy đủ và lớn hơn 0 !!!!",
       });
     }
 
@@ -88,20 +86,20 @@ const TestInfo: React.FC<PostInfoProps> = ({ workId, test, setTest }) => {
           <>
             <div className="grid grid-cols-4 gap-4 text-gray-600">
               <div>
-                <span className="font-medium">Thời lượng làm bài:</span>{' '}
+                <span className="font-medium">Thời lượng làm bài:</span>{" "}
                 {test.testDuration} phút
               </div>
               <div>
-                <span className="font-medium">Số lượng câu hỏi:</span>{' '}
+                <span className="font-medium">Số lượng câu hỏi:</span>{" "}
                 {test.questionCount}
               </div>
               <div>
-                <span className="font-medium">Điểm tiêu chuẩn:</span>{' '}
+                <span className="font-medium">Điểm tiêu chuẩn:</span>{" "}
                 {test.passedPoint}
               </div>
             </div>
             <Button
-              disabled={loading}
+              disabled={isLoading}
               className="mt-4 bg-teal-600 hover:bg-teal-700 text-white"
               onClick={handleEdit}
             >
@@ -119,7 +117,9 @@ const TestInfo: React.FC<PostInfoProps> = ({ workId, test, setTest }) => {
                   type="number"
                   min={0}
                   value={testDuration}
-                  onChange={e => setTestDuration(e.target.valueAsNumber || '')}
+                  onChange={(e) =>
+                    setTestDuration(e.target.valueAsNumber || "")
+                  }
                   placeholder="Nhập thời lượng"
                 />
               </div>
@@ -131,7 +131,9 @@ const TestInfo: React.FC<PostInfoProps> = ({ workId, test, setTest }) => {
                   min={0}
                   type="number"
                   value={questionCount}
-                  onChange={e => setQuestionCount(e.target.valueAsNumber || '')}
+                  onChange={(e) =>
+                    setQuestionCount(e.target.valueAsNumber || "")
+                  }
                   placeholder="Nhập số lượng câu hỏi"
                 />
               </div>
@@ -143,7 +145,7 @@ const TestInfo: React.FC<PostInfoProps> = ({ workId, test, setTest }) => {
                   min={0}
                   type="number"
                   value={passedPoint}
-                  onChange={e => setPassedPoint(e.target.valueAsNumber || '')}
+                  onChange={(e) => setPassedPoint(e.target.valueAsNumber || "")}
                   placeholder="Nhập điểm tiêu chuẩn"
                 />
               </div>
@@ -151,31 +153,31 @@ const TestInfo: React.FC<PostInfoProps> = ({ workId, test, setTest }) => {
             {edit ? (
               <div className="flex flex-row space-x-2">
                 <Button
-                  disabled={loading}
+                  disabled={isLoading}
                   className="bg-gray-400 hover:bg-gray-500 text-white"
                   onClick={handleCancel}
                 >
                   Hủy
                 </Button>
                 <Button
-                  disabled={loading}
+                  disabled={isLoading}
                   className="bg-teal-600 hover:bg-teal-700 text-white"
                   onClick={handleCreateTest}
                 >
                   Cập nhật
-                  {loading && (
+                  {isLoading && (
                     <ClipLoader size={16} color="white" className="mr-2" />
                   )}
                 </Button>
               </div>
             ) : (
               <Button
-                disabled={loading}
+                disabled={isLoading}
                 className="mt-4 bg-teal-600 hover:bg-teal-700 text-white"
                 onClick={handleCreateTest}
               >
                 Tạo bài test
-                {loading && (
+                {isLoading && (
                   <ClipLoader size={16} color="white" className="mr-2" />
                 )}
               </Button>

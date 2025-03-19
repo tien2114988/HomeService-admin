@@ -1,28 +1,24 @@
-import { useEffect, useState } from 'react';
-import { getAllPosts } from '@/services/postService';
-import { PostModel } from '@/models/Post';
-
-import PostTable from '../../posts/components/PostTable';
+import { useGetPostsQuery } from "@/app/api/postApi";
+import PostTable from "../../posts/components/PostTable";
+import { toast } from "@/hooks/use-toast";
 
 const PostList = () => {
-  const [posts, setPosts] = useState<PostModel[]>([]);
-  const [loading, setLoading] = useState(true); // State to track loading
+  const { data, isFetching, isError } = useGetPostsQuery();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true); // Start loading
-      const data = await getAllPosts();
-      setPosts(data.items);
-      setLoading(false); // End loading
-    };
+  const posts = isError || !data?.items ? [] : data.items;
 
-    fetchData();
-  }, []);
+  if (isError) {
+    toast({
+      title: "Thất bại",
+      description: data?.message || "Lỗi không xác định",
+      variant: "destructive",
+    });
+  }
 
   return (
     <div className="w-full">
       <div className="text-xl font-medium mb-2">Quản lý đơn công việc</div>
-      <PostTable posts={posts} loading={loading} />
+      <PostTable posts={posts} loading={isFetching} />
     </div>
   );
 };
