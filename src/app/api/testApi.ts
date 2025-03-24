@@ -1,17 +1,17 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import baseQuery from "./config";
-import { ApiResponse } from "@/models/User";
-import { QuestionModel } from "@/models/Work";
+import { createApi } from '@reduxjs/toolkit/query/react';
+import baseQuery from './config';
+import { ApiResponse } from '@/models/User';
+import { QuestionModel } from '@/models/Work';
 
 export const testApi = createApi({
-  reducerPath: "testApi",
-  baseQuery: baseQuery("/tests"),
-  tagTypes: ["Questions"], // Thêm tag để quản lý cache
-  endpoints: (build) => ({
+  reducerPath: 'testApi',
+  baseQuery: baseQuery('/tests'),
+  tagTypes: ['Questions'], // Thêm tag để quản lý cache
+  endpoints: build => ({
     getQuestions: build.query<ApiResponse<QuestionModel[]>, string>({
-      query: (testId) => `/${testId}/questions`,
-      providesTags: (result, error, testId) => [
-        { type: "Questions", id: testId },
+      query: testId => `/${testId}/questions`,
+      providesTags: (_result, _error, testId) => [
+        { type: 'Questions', id: testId },
       ],
     }),
     addQuestion: build.mutation<
@@ -20,11 +20,11 @@ export const testApi = createApi({
     >({
       query: ({ testId, data }) => ({
         url: `/${testId}/questions`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: (result, error, { testId }) => [
-        { type: "Questions", id: testId },
+      invalidatesTags: (_result, _error, { testId }) => [
+        { type: 'Questions', id: testId },
       ],
     }),
     updateQuestion: build.mutation<
@@ -33,11 +33,11 @@ export const testApi = createApi({
     >({
       query: ({ id, data }) => ({
         url: `/questions/${id}`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: (result, error, { testId }) => [
-        { type: "Questions", id: testId },
+      invalidatesTags: (_result, _error, { testId }) => [
+        { type: 'Questions', id: testId },
       ],
     }),
     deleteQuestion: build.mutation<
@@ -46,10 +46,10 @@ export const testApi = createApi({
     >({
       query: ({ id }) => ({
         url: `/questions/${id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: (result, error, { testId }) => [
-        { type: "Questions", id: testId },
+      invalidatesTags: (_result, _error, { testId }) => [
+        { type: 'Questions', id: testId },
       ],
     }),
   }),

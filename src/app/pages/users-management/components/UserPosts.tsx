@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { PostModel } from "@/models/Post";
+import React from 'react';
+import { PostModel, TakePostModel } from '@/models/Post';
 
-import PostTable from "../../posts/components/PostTable";
-import { UserRole } from "@/lib/constant";
-import {
-  useGetPostsByCustomerIdQuery,
-  useGetPostsByFreelancerIdQuery,
-} from "@/app/api/postApi";
-import { toast } from "@/hooks/use-toast";
+import PostTable from '../../posts/components/PostTable';
+import { UserRole } from '@/lib/constant';
+import { useGetPostsByUserIdQuery } from '@/app/api/postApi';
+import { toast } from '@/hooks/use-toast';
 
 interface UserPostsProps {
   userId: string;
@@ -15,32 +12,32 @@ interface UserPostsProps {
 }
 
 const UserPosts: React.FC<UserPostsProps> = ({ userId, userRole }) => {
-  let posts: PostModel[] = [];
-  let loading;
-  let error;
-  let res;
+  const { data, isFetching, isError } = useGetPostsByUserIdQuery({
+    userId: userId,
+    isCustomer: userRole === UserRole.CUSTOMER,
+  });
 
-  if (userRole === UserRole.CUSTOMER) {
-    const { data, isFetching, isError } = useGetPostsByCustomerIdQuery(userId);
-    error = isError;
-    posts = data?.items && !error ? data.items : [];
-    loading = isFetching;
-    res = data;
+  let posts: PostModel[];
+
+  const isTakePostModel = (
+    items: PostModel[] | TakePostModel[],
+  ): items is TakePostModel[] => {
+    return items.length > 0 && 'post' in items[0]; // Kiểm tra thuộc tính đặc trưng của PostModel
+  };
+
+  if (!data?.items || isError) {
+    posts = [];
+  } else if (!isTakePostModel(data?.items)) {
+    posts = data.items;
   } else {
-    const { data, isFetching, isError } =
-      useGetPostsByFreelancerIdQuery(userId);
-    error = isError;
-    loading = isFetching;
-    posts =
-      data?.items && !error ? data?.items.map((takePost) => takePost.post) : [];
-    res = data;
+    posts = data?.items.map(takePost => takePost.post);
   }
 
-  if (error) {
+  if (isError) {
     toast({
-      title: "Thất bại",
-      description: res?.message || "Lỗi không xác định",
-      variant: "destructive",
+      title: 'Thất bại',
+      description: data?.message || 'Lỗi không xác định',
+      variant: 'destructive',
     });
   }
 
@@ -49,7 +46,7 @@ const UserPosts: React.FC<UserPostsProps> = ({ userId, userRole }) => {
       <h3 className="text-lg font-medium text-teal-700 mb-4">
         Lịch sử công việc
       </h3>
-      <PostTable posts={posts} loading={loading} />
+      <PostTable posts={posts} loading={isFetching} />
     </div>
   );
 };

@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { PostModel, TakePostModel } from "@/models/Post";
-import moment from "moment";
-import { normalizeCreatedAt } from "@/lib/utils";
-import TakePostStatusBadge from "./TakePostStatusBadge";
-import { useNavigate } from "react-router-dom";
-import { UserModel } from "@/models/User";
-import { TakePostStatus } from "@/lib/constant";
-import { useGetFreelancersByPostIdQuery } from "@/app/api/postApi";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { PostModel, TakePostModel } from '@/models/Post';
+import moment from 'moment';
+import { normalizeCreatedAt } from '@/lib/utils';
+import TakePostStatusBadge from './TakePostStatusBadge';
+import { useNavigate } from 'react-router-dom';
+import { UserModel } from '@/models/User';
+import { TakePostStatus } from '@/lib/constant';
+import { useGetFreelancersByPostIdQuery } from '@/app/api/postApi';
 
 interface FreelancerInfoProps {
   post: PostModel;
@@ -24,7 +24,7 @@ interface FreelancerInfoProps {
 const FreelancerInfo: React.FC<FreelancerInfoProps> = ({ post }) => {
   const [selectedTakePost, setSelectedTakePost] =
     useState<TakePostModel | null>(null);
-  const { data, isFetching, isError } = useGetFreelancersByPostIdQuery(post.id);
+  const { data, isError } = useGetFreelancersByPostIdQuery(post.id);
   const takePosts = data?.items && !isError ? data.items : [];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,11 +58,11 @@ const FreelancerInfo: React.FC<FreelancerInfoProps> = ({ post }) => {
         Thông tin người làm
       </h3>
       <div className="pb-4 text-gray-600">
-        <span className="font-medium">Số freelancer đã nhận:</span>{" "}
+        <span className="font-medium">Số freelancer đã nhận:</span>{' '}
         {post.numOfFreelancer} / {post.totalFreelancer}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
-        {sortedTakePosts.map((takePost) => (
+        {sortedTakePosts.map(takePost => (
           <Card
             key={takePost.id}
             className="p-4 hover:shadow-lg cursor-pointer transition space-y-2"
@@ -74,9 +74,9 @@ const FreelancerInfo: React.FC<FreelancerInfoProps> = ({ post }) => {
             </div>
 
             <div className="text-gray-600">
-              <span className="font-medium">Lần cuối cập nhật:</span>{" "}
+              <span className="font-medium">Lần cuối cập nhật:</span>{' '}
               {moment(normalizeCreatedAt(takePost.updatedAt))?.format(
-                "DD/MM/YYYY HH:mm:ss"
+                'DD/MM/YYYY HH:mm:ss',
               )}
             </div>
 
@@ -105,9 +105,9 @@ const FreelancerInfo: React.FC<FreelancerInfoProps> = ({ post }) => {
               </div>
 
               <p>
-                <strong>Lần cập nhật cuối:</strong>{" "}
+                <strong>Lần cập nhật cuối:</strong>{' '}
                 {moment(normalizeCreatedAt(selectedTakePost.updatedAt))?.format(
-                  "DD/MM/YYYY HH:mm:ss"
+                  'DD/MM/YYYY HH:mm:ss',
                 )}
               </p>
               <div
