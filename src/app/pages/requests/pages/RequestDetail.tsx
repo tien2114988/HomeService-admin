@@ -1,27 +1,27 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
-import BreadCrumb from "@/app/layout/components/breadcrumb/BreadCrumb";
-import { Img } from "react-image";
-import { FreelancerWorkStatus, WorkType } from "@/lib/constant";
+import BreadCrumb from '@/app/layout/components/breadcrumb/BreadCrumb';
+import { Img } from 'react-image';
+import { FreelancerWorkStatus, WorkType } from '@/lib/constant';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import moment from "moment";
-import { normalizeCreatedAt } from "@/lib/utils";
-import RequestInfo from "../components/RequestInfo";
-import { FreelancerWorkModel } from "@/models/Work";
-import FreelancerWorkStatusBadge from "../components/FreelancerWorkStatusBadge";
-import TestResult from "../components/TestResult";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
-import { useUpdateRequestMutation } from "@/app/api/workApi";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import moment from 'moment';
+import { normalizeCreatedAt } from '@/lib/utils';
+import RequestInfo from '../components/RequestInfo';
+import { FreelancerWorkModel } from '@/models/Work';
+import FreelancerWorkStatusBadge from '../components/FreelancerWorkStatusBadge';
+import TestResult from '../components/TestResult';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
+import { useUpdateRequestMutation } from '@/app/api/workApi';
 
 const RequestDetail: React.FC = () => {
   const location = useLocation();
   const state = location.state as { request: FreelancerWorkModel };
   const [request, setRequest] = useState<FreelancerWorkModel>(state?.request);
-  const [mode, setMode] = useState<string>("");
+  const [mode, setMode] = useState<string>('');
   const [updateRequest, { isLoading, isError }] = useUpdateRequestMutation();
 
   if (!request) {
@@ -31,6 +31,8 @@ const RequestDetail: React.FC = () => {
       </div>
     );
   }
+
+  console.info({ request });
 
   const handleUpdateRequest = async (status: string) => {
     const workId = request.work.id;
@@ -43,15 +45,15 @@ const RequestDetail: React.FC = () => {
     if (!isError && res.data) {
       setRequest(res.data?.items);
       toast({
-        title: "Thành công",
-        description: "Cập nhật trạng thái thành công",
-        variant: "success",
+        title: 'Thành công',
+        description: 'Cập nhật trạng thái thành công',
+        variant: 'success',
       });
     } else {
       toast({
-        title: "Thất bại",
-        description: "Cập nhật trạng thái thất bại",
-        variant: "destructive",
+        title: 'Thất bại',
+        description: 'Cập nhật trạng thái thất bại',
+        variant: 'destructive',
       });
     }
   };
@@ -60,8 +62,8 @@ const RequestDetail: React.FC = () => {
     <>
       <BreadCrumb
         links={[
-          { label: "Các đơn công việc", href: "/requests/" },
-          { label: `${request.id}`, href: "" },
+          { label: 'Các đơn công việc', href: '/requests/' },
+          { label: `${request.id}`, href: '' },
         ]}
       />
       <div className="min-h-screen space-y-5">
@@ -88,15 +90,15 @@ const RequestDetail: React.FC = () => {
           </div>
           <div>
             <div>
-              <span className="font-medium">Ngày gửi đăng ký:</span>{" "}
+              <span className="font-medium">Ngày gửi đăng ký:</span>{' '}
               {moment(normalizeCreatedAt(request.createdAt))?.format(
-                "DD/MM/YYYY HH:mm:ss"
+                'DD/MM/YYYY HH:mm:ss',
               )}
             </div>
             <div>
-              <span className="font-medium">Lần cập nhật cuối:</span>{" "}
+              <span className="font-medium">Lần cập nhật cuối:</span>{' '}
               {moment(normalizeCreatedAt(request.updatedAt))?.format(
-                "DD/MM/YYYY HH:mm:ss"
+                'DD/MM/YYYY HH:mm:ss',
               )}
             </div>
           </div>

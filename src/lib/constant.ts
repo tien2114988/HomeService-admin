@@ -164,8 +164,8 @@ export const WorkScheduleStatus = {
     value: 'Đã làm',
     bgColor: 'bg-green-400', // Màu xanh dương cho trạng thái đã lên lịch
   },
-  CANCELED: {
-    key: 'CANCELED',
+  CANCELLED: {
+    key: 'CANCELLED',
     value: 'Đã hủy',
     bgColor: 'bg-red-400', // Màu đỏ cho trạng thái bị hủy
   },
